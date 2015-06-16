@@ -22,8 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import net.hydromatic.linq4j.Enumerator;
-
+import org.apache.calcite.linq4j.Enumerator;
 import org.apache.kylin.cube.CubeInstance;
 import org.apache.kylin.cube.CubeManager;
 import org.apache.kylin.cube.model.DimensionDesc;
@@ -34,8 +33,6 @@ import org.apache.kylin.query.schema.OLAPTable;
 import org.apache.kylin.storage.tuple.Tuple;
 
 /**
- * @author yangli9
- * 
  */
 public class LookupTableEnumerator implements Enumerator<Object[]> {
 

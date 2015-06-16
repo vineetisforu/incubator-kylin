@@ -20,27 +20,29 @@ package org.apache.kylin.query.relnode;
 
 import java.util.List;
 
-import net.hydromatic.linq4j.expressions.Blocks;
-import net.hydromatic.linq4j.expressions.Expressions;
-import net.hydromatic.optiq.rules.java.EnumerableRel;
-import net.hydromatic.optiq.rules.java.EnumerableRelImplementor;
-import net.hydromatic.optiq.rules.java.PhysType;
-import net.hydromatic.optiq.rules.java.PhysTypeImpl;
-
+import org.apache.calcite.adapter.enumerable.EnumerableRel;
+import org.apache.calcite.adapter.enumerable.EnumerableRelImplementor;
+import org.apache.calcite.adapter.enumerable.PhysType;
+import org.apache.calcite.adapter.enumerable.PhysTypeImpl;
+import org.apache.calcite.linq4j.tree.Blocks;
+import org.apache.calcite.linq4j.tree.Expressions;
+import org.apache.calcite.plan.ConventionTraitDef;
+import org.apache.calcite.plan.RelOptCluster;
+import org.apache.calcite.plan.RelOptCost;
+import org.apache.calcite.plan.RelOptPlanner;
+import org.apache.calcite.plan.RelOptTable;
+import org.apache.calcite.plan.RelTraitSet;
+import org.apache.calcite.rel.RelNode;
+import org.apache.calcite.rel.convert.ConverterImpl;
+import org.apache.calcite.rel.type.RelDataType;
+import org.apache.kylin.metadata.realization.IRealization;
 import org.apache.kylin.query.routing.NoRealizationFoundException;
 import org.apache.kylin.query.routing.QueryRouter;
 import org.apache.kylin.query.schema.OLAPTable;
-import org.eigenbase.rel.RelNode;
-import org.eigenbase.rel.convert.ConverterRelImpl;
-import org.eigenbase.relopt.*;
-import org.eigenbase.reltype.RelDataType;
-import org.eigenbase.sql.SqlExplainLevel;
-import org.apache.kylin.metadata.realization.IRealization;
 
 /**
- * @author xjiang
  */
-public class OLAPToEnumerableConverter extends ConverterRelImpl implements EnumerableRel {
+public class OLAPToEnumerableConverter extends ConverterImpl implements EnumerableRel {
 
     public OLAPToEnumerableConverter(RelOptCluster cluster, RelTraitSet traits, RelNode input) {
         super(cluster, ConventionTraitDef.INSTANCE, traits, input);
@@ -60,7 +62,7 @@ public class OLAPToEnumerableConverter extends ConverterRelImpl implements Enume
     public Result implement(EnumerableRelImplementor enumImplementor, Prefer pref) {
         // post-order travel children
         OLAPRel.OLAPImplementor olapImplementor = new OLAPRel.OLAPImplementor();
-        olapImplementor.visitChild(getChild(), this);
+        olapImplementor.visitChild(getInput(), this);
 
         // find cube from olap context
         try {
@@ -80,14 +82,14 @@ public class OLAPToEnumerableConverter extends ConverterRelImpl implements Enume
 
         // rewrite query if necessary
         OLAPRel.RewriteImplementor rewriteImplementor = new OLAPRel.RewriteImplementor();
-        rewriteImplementor.visitChild(this, getChild());
+        rewriteImplementor.visitChild(this, getInput());
 
         //        String dumpPlan = RelOptUtil.dumpPlan("", this, false, SqlExplainLevel.DIGEST_ATTRIBUTES);
         //        System.out.println("============================================================================");
         //        System.out.println(dumpPlan);
 
         // build java implementation
-        EnumerableRel child = (EnumerableRel) getChild();
+        EnumerableRel child = (EnumerableRel) getInput();
         OLAPRel.JavaImplementor javaImplementor = new OLAPRel.JavaImplementor(enumImplementor);
         return javaImplementor.visitChild(this, 0, child, pref);
 
