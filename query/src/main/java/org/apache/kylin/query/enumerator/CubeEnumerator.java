@@ -132,11 +132,9 @@ public class CubeEnumerator implements Enumerator<Object[]> {
         // bind dynamic variables
         bindVariable(olapContext.filter);
 
-
-
         // query storage engine
         IStorageEngine storageEngine = StorageEngineFactory.getStorageEngine(olapContext.realization);
-        ITupleIterator iterator = storageEngine.search(olapContext.storageContext,olapContext.getSQLDigest());
+        ITupleIterator iterator = storageEngine.search(olapContext.storageContext, olapContext.getSQLDigest());
         if (logger.isDebugEnabled()) {
             logger.debug("return TupleIterator...");
         }
@@ -144,7 +142,6 @@ public class CubeEnumerator implements Enumerator<Object[]> {
         this.fieldIndexes = null;
         return iterator;
     }
-
 
     private void bindVariable(TupleFilter filter) {
         if (filter == null) {

@@ -31,10 +31,12 @@ import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.plan.RelOptTable;
+import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.RelTraitSet;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.convert.ConverterImpl;
 import org.apache.calcite.rel.type.RelDataType;
+import org.apache.calcite.sql.SqlExplainLevel;
 import org.apache.kylin.metadata.realization.IRealization;
 import org.apache.kylin.query.routing.NoRealizationFoundException;
 import org.apache.kylin.query.routing.QueryRouter;
@@ -84,9 +86,11 @@ public class OLAPToEnumerableConverter extends ConverterImpl implements Enumerab
         OLAPRel.RewriteImplementor rewriteImplementor = new OLAPRel.RewriteImplementor();
         rewriteImplementor.visitChild(this, getInput());
 
-        //        String dumpPlan = RelOptUtil.dumpPlan("", this, false, SqlExplainLevel.DIGEST_ATTRIBUTES);
-        //        System.out.println("============================================================================");
-        //        System.out.println(dumpPlan);
+        if (System.getProperty("calcite.debug") != null) {
+            String dumpPlan = RelOptUtil.dumpPlan("", this, false, SqlExplainLevel.DIGEST_ATTRIBUTES);
+            System.out.println("EXECUTION PLAN AFTER REWRITE");
+            System.out.println(dumpPlan);
+        }
 
         // build java implementation
         EnumerableRel child = (EnumerableRel) getInput();

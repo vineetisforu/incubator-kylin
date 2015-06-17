@@ -148,6 +148,11 @@ public interface OLAPRel extends RelNode {
             if (parent instanceof OLAPRel) {
                 OLAPRel olapRel = (OLAPRel) parent;
                 this.parentContext = olapRel.getContext();
+                System.out.println("Parent: " + olapRel);
+            }
+            if (child instanceof OLAPRel) {
+                OLAPRel olapRel = (OLAPRel) child;
+                System.out.println(this.parentContext + " - " + olapRel.getContext() + " - " + olapRel);
             }
             return super.visitChild(parent, ordinal, child, prefer);
         }

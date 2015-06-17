@@ -348,7 +348,7 @@ public class OLAPAggregateRel extends Aggregate implements OLAPRel, EnumerableRe
         try {
             enumAggRel = new EnumerableAggregate(getCluster(), getCluster().traitSetOf(EnumerableConvention.INSTANCE), getInput(), false, this.groupSet, this.groupSets, rewriteAggCalls);
         } catch (InvalidRelException e) {
-            throw new IllegalStateException("Can't create EnumerableAggregateRel!", e);
+            throw new IllegalStateException("Can't create EnumerableAggregate!", e);
         }
 
         return enumAggRel.implement(implementor, pref);
